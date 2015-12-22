@@ -8,7 +8,7 @@ import (
 
 type Route struct {
 	queueName string
-	fn        func(string)
+	fn        func([]byte)
 }
 
 type Config struct {
@@ -52,10 +52,13 @@ func StartQueueConsumer(queueName string, config Config) {
 	}
 
 	for message := range messages {
-		config.routeMap[queueName].fn(string(message.Body))
+		config.routeMap[queueName].fn(message.Body)
 	}
 }
 
 func Start(routes []Route) {
-	//var config = GetConfig(routes)
+	var config = GetConfig(routes)
+	for queueName, _ := range config.routeMap {
+		go StartQueueConsumer(queueName, config)
+	}
 }
