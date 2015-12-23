@@ -62,7 +62,7 @@ func TestCanPushMessages(t *testing.T) {
 	}
 
 	var messageChannel = make(chan []byte)
-	go messageConsumerWorker(messageChannel, function1)
+	go messageConsumerWorker(messageChannel, function1, "go.1")
 
 	messageChannel <- []byte("This is a message")
 
@@ -75,7 +75,7 @@ func TestCanPushMessages(t *testing.T) {
 func TestItCanConsumeQueue(t *testing.T) {
 
 	Start([]Route{
-		Route{queueName: "go", fn: func(message []byte) {
+		Route{queueName: "go", workers: 4, fn: func(message []byte) {
 			fmt.Println(string(message))
 		}},
 	})

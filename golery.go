@@ -4,6 +4,7 @@ import (
 	"github.com/streadway/amqp"
 	"log"
 	"os"
+	"strconv"
 )
 
 type Route struct {
@@ -74,7 +75,7 @@ func createQueue(channel *amqp.Channel, queueName string) {
 
 }
 
-func messageConsumerWorker(messageChannel chan []byte, fn func([]byte)) {
+func messageConsumerWorker(messageChannel chan []byte, fn func([]byte), workerName string) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println("Recover from", r)
@@ -82,6 +83,7 @@ func messageConsumerWorker(messageChannel chan []byte, fn func([]byte)) {
 	}()
 
 	for message := range messageChannel {
+		log.Println("Message received on worker ", workerName)
 		fn(message)
 	}
 }
@@ -116,7 +118,8 @@ func StartQueueConsumer(queueName string, config Config, TerminatedConsumerChann
 
 	// Start the workers
 	for i := 0; i < workers; i++ {
-		go messageConsumerWorker(messageChannel, config.routeMap[queueName].fn)
+		workerName := queueName + "." + strconv.Itoa(i)
+		go messageConsumerWorker(messageChannel, config.routeMap[queueName].fn, workerName)
 	}
 
 	// Push messages into channel
