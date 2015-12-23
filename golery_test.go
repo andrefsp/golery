@@ -10,9 +10,9 @@ func TestCanRouteMessage(t *testing.T) {
 		receivedMessages = append(receivedMessages, message)
 	}
 
-	var route = Route{queueName: "TestQueue", fn: fn}
+	var route = Route{QueueName: "TestQueue", Fn: fn}
 
-	route.fn([]byte("this is a test"))
+	route.Fn([]byte("this is a test"))
 	if len(receivedMessages) < 1 {
 		t.Fail()
 	}
@@ -25,11 +25,11 @@ func TestGetConfigCreatesRoutes(t *testing.T) {
 	}
 
 	var routes = []Route{
-		Route{queueName: "queue1", fn: function1},
+		Route{QueueName: "queue1", Fn: function1},
 	}
 	var config = GetConfig(routes)
 
-	config.routeMap["queue1"].fn([]byte("this is a message"))
+	config.routeMap["queue1"].Fn([]byte("this is a message"))
 
 	if len(receivedMessages) < 1 {
 		t.Fail()
@@ -43,11 +43,11 @@ func TestCanIterateConfig(t *testing.T) {
 	}
 
 	var config = GetConfig([]Route{
-		Route{queueName: "queue1", fn: function1},
+		Route{QueueName: "queue1", Fn: function1},
 	})
 
 	for key, route := range config.routeMap {
-		route.fn([]byte(key))
+		route.Fn([]byte(key))
 	}
 
 	if len(receivedMessages) < 1 {
@@ -75,7 +75,7 @@ func TestCanPushMessages(t *testing.T) {
 func TestItCanConsumeQueue(t *testing.T) {
 
 	Start([]Route{
-		Route{queueName: "go", workers: 4, fn: func(message []byte) {
+		Route{QueueName: "go", Workers: 4, Fn: func(message []byte) {
 			fmt.Println(string(message))
 		}},
 	})

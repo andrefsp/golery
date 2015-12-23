@@ -8,9 +8,9 @@ import (
 )
 
 type Route struct {
-	queueName string
-	fn        func([]byte)
-	workers   int
+	QueueName string
+	Fn        func([]byte)
+	Workers   int
 }
 
 type Config struct {
@@ -28,7 +28,7 @@ func GetConfig(routes []Route) Config {
 	}
 
 	for i := 0; i < len(routes); i++ {
-		routeMap[routes[i].queueName] = routes[i]
+		routeMap[routes[i].QueueName] = routes[i]
 	}
 
 	return Config{RABBITMQ_URL: RABBITMQ_URL, routeMap: routeMap}
@@ -112,14 +112,14 @@ func StartQueueConsumer(queueName string, config Config, TerminatedConsumerChann
 
 	var workers = 1
 
-	if config.routeMap[queueName].workers > 0 {
-		workers = config.routeMap[queueName].workers
+	if config.routeMap[queueName].Workers > 0 {
+		workers = config.routeMap[queueName].Workers
 	}
 
 	// Start the workers
 	for i := 0; i < workers; i++ {
 		workerName := queueName + "." + strconv.Itoa(i)
-		go messageConsumerWorker(messageChannel, config.routeMap[queueName].fn, workerName)
+		go messageConsumerWorker(messageChannel, config.routeMap[queueName].Fn, workerName)
 	}
 
 	// Push messages into channel
